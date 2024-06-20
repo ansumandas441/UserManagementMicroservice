@@ -1,8 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { UserManagementServiceModule } from './user-management-service.module';
+import { AppModule } from './app.module'; 
+import dotenv from 'dotenv';
 
 async function bootstrap() {
-  const app = await NestFactory.create(UserManagementServiceModule);
+  const app = await NestFactory.create(AppModule);
   await app.listen(3000);
 }
 bootstrap();
