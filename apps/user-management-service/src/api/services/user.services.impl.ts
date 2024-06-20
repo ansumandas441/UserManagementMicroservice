@@ -6,6 +6,7 @@ import { BlockUserDto } from '../dtos/block-user.dto';
 import { UpdateUserDto } from '../dtos/update-user.dto';
 import { UserModel } from '../models/user.model';
 import { Prisma } from '@prisma/client';
+import calculateMinMaxDate from '../../utils/date.utils';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -37,16 +38,30 @@ export class UserServiceImpl implements UserService {
     });
     return updatedUser;
   }
-  deleteUser(id: number): Promise<void> {
+  async deleteUser(id: number): Promise<void> {
     throw new Error('Method not implemented.');
   }
-  searchUsers(username: string, minAge?: number, maxAge?: number): Promise<UserModel[]> {
+  async searchUsers(username: string, minAge?: number, maxAge?: number): Promise<UserModel[]> {
+    let {minDate, maxDate} = calculateMinMaxDate(minAge, maxAge);
+    const where : Prisma.UserWhereInput = {
+      username: { contains: username, mode: 'insensitive' }
+    };
+
+    if(minDate!==undefined){
+      where.birthdate = { lte: minDate };
+    }
+    if(maxDate!==undefined){
+      where.birthdate = (where.birthdate && typeof where.birthdate==='object')? { ...where.birthdate, gte: maxDate } : { gte: maxDate } ;
+    }
+    const searchResult  = await this.prisma.user.findMany({
+      where
+    });
+    return searchResult;
+  }
+  async blockUser(blockUserDto: BlockUserDto): Promise<void> {
     throw new Error('Method not implemented.');
   }
-  blockUser(blockUserDto: BlockUserDto): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-  unblockUser(blockUserDto: BlockUserDto): Promise<void> {
+  async unblockUser(blockUserDto: BlockUserDto): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
