@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from "@nestjs/common";
 import { CreateUserDto } from "../dtos/create-user.dto";
 import { UpdateUserDto } from "../dtos/update-user.dto";
 import { UserModel } from "../models/user.model";
@@ -28,16 +28,15 @@ export class UserController {
         @Query('minAge') minAge: number,
         @Query('maxAge') maxAge: number,
       ): Promise<UserModel[]> {
-        return await this.userService.searchUsers(username, minAge, maxAge);
+        return await this.userService.searchUsers(1 ,username, minAge, maxAge);
       }
     @Post('block/:id')
-    async blockUser(@Param('id') id: number): Promise<void> {
-        // Assume BlockUserDto is used for more complex blocking scenarios
-        return await this.userService.blockUser({ userId: id });
+    async blockUser(@Param('id',ParseIntPipe) id: number): Promise<void> {
+        return await this.userService.blockUser(1,{ blockedUserId: id });
     }
     @Post('unblock/:id')
-    async unblockUser(@Param('id') id: number): Promise<void> {
+    async unblockUser(@Param('id',ParseIntPipe) id: number): Promise<void> {
         // Assume BlockUserDto is used for more complex unblocking scenarios
-        return await this.userService.unblockUser({ userId: id });
+        return await this.userService.unblockUser(1,{ blockedUserId: id });
     }
 }

@@ -4,5 +4,6 @@ export interface UserModel {
     surname: string;
     username: string;
     birthdate: Date;
+    blockedContacts?: number[];
   }
   

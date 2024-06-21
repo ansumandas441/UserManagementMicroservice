@@ -6,7 +6,7 @@ import { BlockUserDto } from '../dtos/block-user.dto';
 import { UpdateUserDto } from '../dtos/update-user.dto';
 import { UserModel } from '../models/user.model';
 import { Prisma } from '@prisma/client';
-import calculateMinMaxDate from '../../utils/date.utils';
+import { calculateMinMaxDate } from '../../utils/date.utils'
 
 @Injectable()
 export class UserServiceImpl implements UserService {
@@ -16,7 +16,7 @@ export class UserServiceImpl implements UserService {
     try {
       const { username } = createUserDto;
       const existingUser = await this.prisma.user.findUnique({
-        where: { username },
+        where: { username: username },
       });
 
       if (existingUser) {
@@ -46,7 +46,7 @@ export class UserServiceImpl implements UserService {
         if (updateUserDto.birthdate !== undefined) data.birthdate = new Date(updateUserDto.birthdate);
 
       const updatedUser = await this.prisma.user.update({
-        where: {id},
+        where: {id:id},
         data
       });
       return updatedUser;
@@ -103,11 +103,11 @@ export class UserServiceImpl implements UserService {
   async blockUser(currentUserId: number, blockUserDto: BlockUserDto): Promise<any> {
     try {
       const { blockedUserId } = blockUserDto;
-      const blockerUser = await this.prisma.user.findUnique({
+      const blockedUser = await this.prisma.user.findUnique({
         where: { id: blockedUserId}
       });
       
-      if(!blockerUser) {
+      if(!blockedUser) {
         throw new NotFoundException(`User with id ${blockedUserId} not found`);
       }
 
@@ -115,7 +115,7 @@ export class UserServiceImpl implements UserService {
         where: { id: currentUserId}
       });
 
-      if (user.blockedContacts.includes(blockedUserId)) {
+      if (user.blockedContacts && user.blockedContacts.includes(blockedUserId)) {
         return {message: "User is already blocked"}; 
       }
 
@@ -127,7 +127,9 @@ export class UserServiceImpl implements UserService {
           }
         }
       });
-      return `User with id: ${blockedUserId} is blocked`;
+      return {
+        message:`User with id: ${blockedUserId} is blocked`
+      };
 
     } catch (error) {
       throw error;
@@ -148,8 +150,8 @@ export class UserServiceImpl implements UserService {
         where: { id: currentUserId}
       });
 
-      if (user.blockedContacts.includes(blockedUserId)) {
-        return {message: "User is already blocked"}; 
+      if (!user.blockedContacts.includes(blockedUserId)) {
+        return {message: "User is not blocked"}; 
       }
 
       await this.prisma.user.update({
@@ -160,7 +162,9 @@ export class UserServiceImpl implements UserService {
           }
         }
       });
-      return `User with id: ${blockedUserId} is blocked`;
+      return {
+        message:`User with id: ${blockedUserId} is unblocked`
+      };
 
     } catch (error) {
       throw error;
