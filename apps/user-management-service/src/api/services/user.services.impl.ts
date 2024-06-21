@@ -54,7 +54,7 @@ export class UserServiceImpl implements UserService {
       if (error.code === 'P2025') {
         throw new NotFoundException(`User with id ${id} not found`);
       }
-      throw error; // Let NestJS handle other unexpected errors
+      throw error; 
     }
   }
   async deleteUser(id: number): Promise<any> {

@@ -9,7 +9,7 @@ import { PrismaModule } from './modules/prisma/prisma.module';
     ConfigModule.forRoot({isGlobal: true}),
     UserModule,
     PrismaModule,
-  ], // Import the UserModule which contains the UserController
+  ], 
   providers: [],
 })
 export class AppModule {}

@@ -191,7 +191,7 @@ describe('UserService', () => {
       });
     
       it('should throw NotFoundException if blocked user is not found', async () => {
-        jest.spyOn(prismaService.user,'findUnique').mockResolvedValueOnce(null); // Mock blocked user as not found
+        jest.spyOn(prismaService.user,'findUnique').mockResolvedValueOnce(null); 
     
         await expect(service.blockUser(currentUserId, blockUserDto)).rejects.toThrow(NotFoundException);
       });
@@ -218,8 +218,6 @@ describe('UserService', () => {
           message: `User with id: ${blockedUserId} is blocked`
         }
         const result = await service.blockUser(currentUserId, blockUserDto);
-        console.log("Blocker user", blockedReponse);
-        console.log("result",result);
         expect(result).toEqual(blockedReponse);
       });
     });

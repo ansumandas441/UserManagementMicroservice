@@ -1,5 +1,3 @@
-// create-user.dto.spec.ts
-
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { CreateUserDto } from '../src/api/dtos/create-user.dto';
@@ -18,7 +16,7 @@ describe('CreateUserDto', () => {
     const dto = plainToClass(CreateUserDto, input);
     const errors = await validate(dto);
 
-    expect(errors.length).toBe(0); // No validation errors
+    expect(errors.length).toBe(0); 
   });
 
   it('should detect missing required fields', async () => {
@@ -32,7 +30,7 @@ describe('CreateUserDto', () => {
     const dto = plainToClass(CreateUserDto, input);
     const errors = await validate(dto);
 
-    expect(errors.length).toBeGreaterThan(0); // Should have validation errors
+    expect(errors.length).toBeGreaterThan(0); 
     expect(errors[0].constraints).toHaveProperty('isNotEmpty');
   });
 
@@ -112,16 +110,16 @@ describe('UpdateUserDto', () => {
       const dto = plainToClass(UpdateUserDto, input);
       const errors = await validate(dto);
   
-      expect(errors.length).toBe(0); // No validation errors
+      expect(errors.length).toBe(0); 
     });
   
     it('should not fail when fields are missing', async () => {
-        const input = {}; // All fields are optional
+        const input = {}; 
     
         const dto = plainToClass(UpdateUserDto, input);
         const errors = await validate(dto);
     
-        expect(errors.length).toBe(0); // No validation errors because all fields are optional
+        expect(errors.length).toBe(0); 
     });
   
     it('should detect invalid date format', async () => {
