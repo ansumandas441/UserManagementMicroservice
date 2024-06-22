@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Request } from "@nestjs/common";
 import { CreateUserDto } from "../dtos/create-user.dto";
 import { UpdateUserDto } from "../dtos/update-user.dto";
 import { UserModel } from "../models/user.model";
 import { UserService } from "../interfaces/user-services.interfaces";
+import { getUserIdFromToken } from "../../utils/token.utils";
 
 @Controller('users')
 export class UserController {
@@ -24,19 +25,31 @@ export class UserController {
 
     @Get('search')
     async searchUsers(
+        @Request() req,
         @Query('username') username: string,
         @Query('minAge') minAge: number,
         @Query('maxAge') maxAge: number,
       ): Promise<UserModel[]> {
-        return await this.userService.searchUsers(1 ,username, minAge, maxAge);
+        const token = req.headers.token;
+        const userId = getUserIdFromToken(token);
+        return await this.userService.searchUsers(userId ,username, minAge, maxAge);
       }
     @Post('block/:id')
-    async blockUser(@Param('id',ParseIntPipe) id: number): Promise<void> {
+    async blockUser(
+        @Request() req,
+        @Param('id',ParseIntPipe) id: number
+        ): Promise<void> {
+        const token = req.headers.token;
+        const userId = getUserIdFromToken(token);
         return await this.userService.blockUser(1,{ blockedUserId: id });
     }
     @Post('unblock/:id')
-    async unblockUser(@Param('id',ParseIntPipe) id: number): Promise<void> {
-        // Assume BlockUserDto is used for more complex unblocking scenarios
+    async unblockUser(
+        @Request() req,
+        @Param('id',ParseIntPipe) id: number
+        ): Promise<void> {
+        const token = req.headers.token;
+        const userId = getUserIdFromToken(token);    
         return await this.userService.unblockUser(1,{ blockedUserId: id });
     }
 }

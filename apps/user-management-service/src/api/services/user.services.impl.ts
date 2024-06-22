@@ -35,6 +35,12 @@ export class UserServiceImpl implements UserService {
         }
       });
       
+      //delete cache
+      const keys = await this.redisClient.keys('*'); 
+      if (keys.length > 0) {
+        await this.redisClient.del(keys); 
+      }
+
       return createdUser;
       
     } catch(error) {
@@ -53,6 +59,13 @@ export class UserServiceImpl implements UserService {
         where: {id:id},
         data
       });
+
+      //delete cache
+      const keys = await this.redisClient.keys('*'); 
+      if (keys.length > 0) {
+        await this.redisClient.del(keys); 
+      }
+
       return updatedUser;
     } catch(error){
       if (error.code === 'P2025') {
@@ -66,6 +79,13 @@ export class UserServiceImpl implements UserService {
       await this.prisma.user.delete({
         where: {id}
       });
+
+      //delete cache
+      const keys = await this.redisClient.keys('*'); 
+      if (keys.length > 0) {
+        await this.redisClient.del(keys); 
+      }
+
       return {
         message: 'User deleted successfully'
       }
@@ -79,7 +99,18 @@ export class UserServiceImpl implements UserService {
   async searchUsers(currentUserId: number, username: string, minAge?: number, maxAge?: number): Promise<UserModel[]> {
     let {minDate, maxDate} = calculateMinMaxDate(minAge, maxAge);
     
-    const cacheKey = `user_search_${username}_${minAge}_${maxAge}`;
+    let cacheKey;
+    if(!minAge && !maxAge){
+      cacheKey=`user_search_${username}`;
+    } else if(minAge && !maxAge){
+      cacheKey = `user_search_${username}_${minAge}_U`;
+    } else if(!minAge && maxAge){
+      cacheKey = `user_search_${username}_L_${maxAge}`;
+    } else {
+      cacheKey =`user_search_${username}_${minAge}_${maxAge}`;
+    }
+    
+    
     const cachedReponse = await this.redisClient.get(cacheKey);
 
     if(cachedReponse){
@@ -87,7 +118,7 @@ export class UserServiceImpl implements UserService {
     }
 
     let currentUser = await this.prisma.user.findUnique({
-      where: {id: currentUserId}
+      where: {id: Number(currentUserId)}
     });
     let blockedIds = currentUser.blockedContacts;
     const where : Prisma.UserWhereInput = {
@@ -145,6 +176,13 @@ export class UserServiceImpl implements UserService {
           }
         }
       });
+
+      //delete cache
+      const keys = await this.redisClient.keys('*'); 
+      if (keys.length > 0) {
+        await this.redisClient.del(keys); 
+      }
+
       return {
         message:`User with id: ${blockedUserId} is blocked`
       };
@@ -180,6 +218,13 @@ export class UserServiceImpl implements UserService {
           }
         }
       });
+
+      //delete cache
+      const keys = await this.redisClient.keys('*'); 
+      if (keys.length > 0) {
+        await this.redisClient.del(keys); 
+      }
+
       return {
         message:`User with id: ${blockedUserId} is unblocked`
       };
