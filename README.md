@@ -92,6 +92,8 @@
 
 ## API Reference
 
+#### deployed URI: https://user-management-service2.onrender.com
+
 #### Create User
 
 ```http
