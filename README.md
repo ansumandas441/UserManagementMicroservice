@@ -1,5 +1,8 @@
 # UserManagementMicroservice
 
+
+
+
 ## Problem description:
 
 [problem statement](http://docs.google.com/document/d/14R6ltID1NEL9ttR9iMl7OtHZ6N6wlllUtutPzjRLGwo/edit)
@@ -103,7 +106,19 @@
 | username  | string | User's unique user name.                |
 | birthdate | string | User's birthdate in  YYYY-MM-DD format. |
 
-**Request URL**:
+**Request URL**: https://user-management-service2.onrender.com/users/create
+
+**cURL**: 
+```
+curl --location 'https://user-management-service2.onrender.com/users/create' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name": "namesd",
+    "surname": "surnsdame",
+    "username": "nameusr23",
+    "birthdate": "2000-11-12"
+}'
+```
 
 **Request Body**:
 
@@ -160,8 +175,17 @@ or
 | birthdate | string(optional) | User's birthdate in  YYYY-MM-DD format. |
 
 
-**Request URL**:
+**Request URL**:  https://user-management-service2.onrender.com/users/edit/{id}
 
+**cURL**: 
+```
+curl --location --request PATCH 'https://user-management-service2.onrender.com/users/edit/6?id=6' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name": "namesd2",
+    "birthdate": "2014-11-12"
+}'
+```
 
 
 **Request Body**:
@@ -203,7 +227,13 @@ or
 | id        | number           | Unique identifier for the target user for delete.         |
 
 
-**Request URL**:
+**Request URL**:  https://user-management-service2.onrender.com/users/delete/{id}
+
+
+**cURL**: 
+```
+curl --location --request DELETE 'https://user-management-service2.onrender.com/users/delete/4'
+```
 
 **Response Body**:
 ```
@@ -226,7 +256,14 @@ response(200):{
 | maxAge    | string(optional) | Other users minAge                   |
 
 
-**Request URL**:
+**Request URL**:  https://user-management-service2.onrender.com/users/search/{id}
+
+**cURL**: 
+```
+curl --location 'https://user-management-service2.onrender.com/users/search?username=username&minAge=10&maxAge=25' \
+--header 'token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2IiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.NlVN1CIDgT4ITGGpRQPkabyWOgi_VBEL0AUIpBKSW74' \
+--data ''
+```
 
 **Response Body**:
 
@@ -255,7 +292,13 @@ response(201):{
 | id        | number | Other users id                       |
 
 
-**Request URL**:
+**Request URL**:  https://user-management-service2.onrender.com/users/block/{id}
+
+**cURL**: 
+```
+curl --location --request POST 'https://user-management-service2.onrender.com/users/block/6' \
+--header 'token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2IiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.NlVN1CIDgT4ITGGpRQPkabyWOgi_VBEL0AUIpBKSW74'
+```
 
 **Response Body**:
 
@@ -283,8 +326,13 @@ response(201):{
 | userId    | number | Unique identifier for the host user. |
 | id        | number | Other users id                       |
 
+**Request URL**:https://user-management-service2.onrender.com/users/unblock/{id}
 
-**Request URL**:
+**cURL**: 
+```
+curl --location --request POST 'https://user-management-service2.onrender.com/users/unblock/6' \
+--header 'token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2IiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.NlVN1CIDgT4ITGGpRQPkabyWOgi_VBEL0AUIpBKSW74'
+```
 
 **Response Body**:
 
