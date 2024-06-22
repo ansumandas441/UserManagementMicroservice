@@ -7,10 +7,13 @@ import { UpdateUserDto } from '../dtos/update-user.dto';
 import { UserModel } from '../models/user.model';
 import { Prisma } from '@prisma/client';
 import { calculateMinMaxDate } from '../../utils/date.utils'
+import { redisClient } from './redis.service';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {
+    redisClient.connect();
+  }
 
   async createUser(createUserDto: CreateUserDto): Promise<UserModel> {
     try {
@@ -74,6 +77,13 @@ export class UserServiceImpl implements UserService {
   }
   async searchUsers(currentUserId: number, username: string, minAge?: number, maxAge?: number): Promise<UserModel[]> {
     let {minDate, maxDate} = calculateMinMaxDate(minAge, maxAge);
+    const cacheKey = `user_search_${username}_${minAge}_${maxAge}`;
+    const cachedReponse = await redisClient.get(cacheKey);
+
+    if(cachedReponse){
+      return JSON.parse(cachedReponse);
+    }
+
     let currentUser = await this.prisma.user.findUnique({
       where: {id: currentUserId}
     });
@@ -98,6 +108,12 @@ export class UserServiceImpl implements UserService {
     const searchResult  = await this.prisma.user.findMany({
       where
     });
+
+     // Cache the result
+    await redisClient.set(cacheKey, JSON.stringify(searchResult), {
+      EX: 3600, // expires in 1 hour
+    });
+
     return searchResult;
   }
   async blockUser(currentUserId: number, blockUserDto: BlockUserDto): Promise<any> {
