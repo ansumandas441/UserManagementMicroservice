@@ -9,29 +9,32 @@
 
 
 ## Functional requirement
- - Create, Read, Update, Delete operations on user data.
- - The read operation is more so should be faster.
- - Users can be searched using username.
+ - Create, Read, Update, and Delete operations on user data.
+ - The read operation is more so it should be faster.
+ - Users can be searched using a username.
  - Users can be searched using age range(Min, max or both).
- - For search user should have jwt(non verified) token with id
+ - For Search user should have jwt(non verified) token with id
  - Don’t show blocked users in the search 
- - One user can block other user.
- - User can unblock one user?
+ - One user can block another user.
+ - A user can unblock one user?
  - Inputs should have simple validations.
 
 
 
 ## Design considerations
 
- - SQL is used for it’s ACID properties and fixed schema.
- - The read request is generally much more for search functionality than write request. So need redis caching for faster response. For a name the data is saved in redis. Based on specific name and age range the range query can be done from the redis database.
- - For only range based query the data is fetched form the Postgresql database.
+ - SQL is used for its ACID properties and fixed schema.
+ - The read request is generally much more for search functionality than the write request. So need Redis caching for faster response. For a name, the data is saved in Redis. Based on specific name and age range the range query can be done from the Redis database.
+ - For only range-based queries the data is fetched from the Postgresql database.
  - Multiple users can be created with the same name, surname and username.
 
 
 ## Some Features of this project
  - Monorepo using yarn for later code integration
- - Have essence of MVC and clean architecture, primarily alings with Modular architecture
+ - Have the essence of MVC and clean architecture, primarily aligns with Modular architecture
+ - User jest and superset for Unit test and endpoint testing.
+ - Used class-validator for simple request validation.
+ - Used Redis for caching.
 
 
 ##Structure of the project:
