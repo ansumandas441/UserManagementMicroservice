@@ -4,9 +4,10 @@ import { PrismaService } from '../../api/services/prisma.service';
 import { UserService } from '../../api/interfaces/user-services.interfaces';
 import { UserController } from '../../api/controllers/user.controller';
 import { PrismaModule } from '../prisma/prisma.module';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
-  imports:[PrismaModule],
+  imports:[PrismaModule, RedisModule],
   controllers: [UserController],
   providers: [ 
     {

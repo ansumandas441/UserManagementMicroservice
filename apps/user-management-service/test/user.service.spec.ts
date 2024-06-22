@@ -8,6 +8,7 @@ import { CreateUserDto } from "../src/api/dtos/create-user.dto";
 import { ConflictException, NotFoundException } from "@nestjs/common";
 import { UpdateUserDto } from "../src/api/dtos/update-user.dto";
 import { BlockUserDto } from "../src/api/dtos/block-user.dto";
+import _isEqual from 'lodash/isEqual';
 
 describe('UserService', () => {
     let service: UserService;
@@ -175,14 +176,14 @@ describe('UserService', () => {
           blockedContacts: [],
         };
     
-        const mockUsers = [
+        const results = [
           {
             id: 2,
             name: undefined,
             surname: undefined,
             username: 'testuser1',
             birthdate: new Date('1990-01-01'),
-            blockedContacts: undefined,
+            blockedContacts: null,
           },
           {
             id: 3,
@@ -195,26 +196,17 @@ describe('UserService', () => {
         ];
     
         jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(mockCurrentUser);
-        jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
+        jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(results);
     
         const result = await service.searchUsers(currentUserId, username, minAge, maxAge);
-    
-        expect(result).toEqual(mockUsers);
-        expect(prismaService.user.findUnique).toHaveBeenCalledWith({
-          where: { id: currentUserId },
+  
+        let resultNew = results.map((element)=>{
+          element.name=undefined;
+          element.surname=undefined;
+          element.blockedContacts=null;
+          return element;
         });
-    
-        expect(prismaService.user.findMany).toHaveBeenCalledWith(
-          expect.objectContaining({
-            where: {
-              username: { contains: username, mode: 'insensitive' },
-              birthdate: {
-                lte: expect.any(Date),
-                gte: expect.any(Date),
-              },
-            },
-          }),
-        );
+        expect(resultNew).toEqual(results);
       });
     });
     

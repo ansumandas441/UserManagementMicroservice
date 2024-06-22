@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import  { PrismaService } from './prisma.service';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { UserService } from '../interfaces/user-services.interfaces';
@@ -8,12 +8,13 @@ import { UserModel } from '../models/user.model';
 import { Prisma } from '@prisma/client';
 import { calculateMinMaxDate } from '../../utils/date.utils'
 import { redisClient } from './redis.service';
+import { RedisClientType } from 'redis';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
-  constructor(private readonly prisma: PrismaService) {
-    redisClient.connect();
-  }
+  constructor(private readonly prisma: PrismaService,
+    @Inject('REDIS_CLIENT') private readonly redisClient: RedisClientType
+  ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<UserModel> {
     try {
@@ -77,8 +78,9 @@ export class UserServiceImpl implements UserService {
   }
   async searchUsers(currentUserId: number, username: string, minAge?: number, maxAge?: number): Promise<UserModel[]> {
     let {minDate, maxDate} = calculateMinMaxDate(minAge, maxAge);
+    
     const cacheKey = `user_search_${username}_${minAge}_${maxAge}`;
-    const cachedReponse = await redisClient.get(cacheKey);
+    const cachedReponse = await this.redisClient.get(cacheKey);
 
     if(cachedReponse){
       return JSON.parse(cachedReponse);
@@ -110,7 +112,7 @@ export class UserServiceImpl implements UserService {
     });
 
      // Cache the result
-    await redisClient.set(cacheKey, JSON.stringify(searchResult), {
+    await this.redisClient.set(cacheKey, JSON.stringify(searchResult), {
       EX: 3600, // expires in 1 hour
     });
 
