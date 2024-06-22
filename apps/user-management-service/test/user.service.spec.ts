@@ -8,7 +8,6 @@ import { CreateUserDto } from "../src/api/dtos/create-user.dto";
 import { ConflictException, NotFoundException } from "@nestjs/common";
 import { UpdateUserDto } from "../src/api/dtos/update-user.dto";
 import { BlockUserDto } from "../src/api/dtos/block-user.dto";
-import { formatDate } from "../src/utils/date.utils";
 
 describe('UserService', () => {
     let service: UserService;
@@ -25,6 +24,7 @@ describe('UserService', () => {
         prismaService.user.update = jest.fn();
         prismaService.user.findUnique = jest.fn();
         prismaService.user.delete = jest.fn();
+        prismaService.user.findMany = jest.fn();
     });
 
     afterAll(() => {
@@ -158,6 +158,66 @@ describe('UserService', () => {
         });
       });
     });
+
+    describe('searchUser', () => {
+      it('should search users by username and age range', async () => {
+        const currentUserId = 1;
+        const username = 'testuser';
+        const minAge = 20;
+        const maxAge = 30;
+    
+        const mockCurrentUser = {
+          id: currentUserId,
+          name: undefined,
+          surname: undefined,
+          username: undefined,
+          birthdate: undefined,
+          blockedContacts: [],
+        };
+    
+        const mockUsers = [
+          {
+            id: 2,
+            name: undefined,
+            surname: undefined,
+            username: 'testuser1',
+            birthdate: new Date('1990-01-01'),
+            blockedContacts: undefined,
+          },
+          {
+            id: 3,
+            name: undefined,
+            surname: undefined,
+            username: 'testuser2',
+            birthdate: new Date('1995-06-15'),
+            blockedContacts: null,
+          },
+        ];
+    
+        jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(mockCurrentUser);
+        jest.spyOn(prismaService.user, 'findMany').mockResolvedValue(mockUsers);
+    
+        const result = await service.searchUsers(currentUserId, username, minAge, maxAge);
+    
+        expect(result).toEqual(mockUsers);
+        expect(prismaService.user.findUnique).toHaveBeenCalledWith({
+          where: { id: currentUserId },
+        });
+    
+        expect(prismaService.user.findMany).toHaveBeenCalledWith(
+          expect.objectContaining({
+            where: {
+              username: { contains: username, mode: 'insensitive' },
+              birthdate: {
+                lte: expect.any(Date),
+                gte: expect.any(Date),
+              },
+            },
+          }),
+        );
+      });
+    });
+    
 
     describe('blockUser', () => {
       const currentUserId = 1;
