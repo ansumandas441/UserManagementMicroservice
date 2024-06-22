@@ -34,7 +34,7 @@
  - Have the essence of MVC and clean architecture, primarily aligns with Modular architecture
  - User jest and superset for Unit test and endpoint testing.
  - Used class-validator for simple request validation.
- - Used Redis for caching.
+ - Used Redis(cloud) for caching and PostgreSQL as database(neon cloud).
 
 
 ##Structure of the project:
