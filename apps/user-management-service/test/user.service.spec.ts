@@ -8,7 +8,6 @@ import { CreateUserDto } from "../src/api/dtos/create-user.dto";
 import { ConflictException, NotFoundException } from "@nestjs/common";
 import { UpdateUserDto } from "../src/api/dtos/update-user.dto";
 import { BlockUserDto } from "../src/api/dtos/block-user.dto";
-import _isEqual from 'lodash/isEqual';
 
 describe('UserService', () => {
     let service: UserService;
